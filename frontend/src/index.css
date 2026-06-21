@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: #0B1220;
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0) scale(1.02) rotate(0deg);
+  }
+  20% {
+    transform: translateX(-3px) scale(1.02) rotate(-1deg);
+  }
+  40% {
+    transform: translateX(3px) scale(1.02) rotate(1deg);
+  }
+  60% {
+    transform: translateX(-2px) scale(1.02) rotate(-0.5deg);
+  }
+  80% {
+    transform: translateX(2px) scale(1.02) rotate(0.5deg);
+  }
+}
