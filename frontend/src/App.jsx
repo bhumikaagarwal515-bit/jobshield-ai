@@ -42,11 +42,11 @@ const TEXT = {
 // ---------------------------------------------------------
 async function callAnalyzeAPI(jobText) {
   // ---- REAL BACKEND CALL (uncomment when Person 1 backend ready) ----
-  // const res = await fetch("http://localhost:8000/analyze", {
-  //   method: "POST",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify({ text: jobText }),
-  // });
+  const res = await fetch("http://localhost:8000/analyze", {
+     method: "POST",
+     headers: { "Content-Type": "application/json" },
+     body: JSON.stringify({ text: jobText }),
+   });
   // if (!res.ok) throw new Error("Server error");
   // return await res.json();
 
