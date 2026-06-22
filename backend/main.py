@@ -10,6 +10,9 @@ import json
 load_dotenv()
 
 app = FastAPI()
+@app.get("/")
+def root():
+    return {"status": "JobShield AI is running!"}
 
 # CORS allow karo taaki frontend (React) backend se baat kar sake
 app.add_middleware(
