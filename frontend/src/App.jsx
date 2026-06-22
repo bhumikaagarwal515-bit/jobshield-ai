@@ -153,7 +153,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B1220] text-[#E8ECF4] flex flex-col items-center px-4 py-10 sm:py-16">
+    <div className="min-h-screen bg-white text-[#1a1a2e] flex flex-col items-center px-4 py-10 sm:py-16">
       {/* ---------- HEADER ---------- */}
       <header className="w-full max-w-2xl flex items-center justify-between mb-8 sm:mb-12">
         <div className="flex items-center gap-2.5">
@@ -187,12 +187,12 @@ export default function App() {
                 placeholder={t.placeholder}
                 rows={9}
                 disabled={loading}
-                className="w-full resize-none rounded-2xl bg-[#131B2E] border border-white/10 focus:border-[#4F8EF7]/60 focus:ring-2 focus:ring-[#4F8EF7]/20 outline-none p-4 sm:p-5 text-sm sm:text-base placeholder:text-[#5C6479] transition-colors disabled:opacity-50"
+                className="w-full resize-none rounded-2xl bg-[#f5f5f5] border border-white/10 focus:border-[#4F8EF7]/60 focus:ring-2 focus:ring-[#4F8EF7]/20 outline-none p-4 sm:p-5 text-sm sm:text-base placeholder:text-[#5C6479] transition-colors disabled:opacity-50"
               />
               <button
                 onClick={handlePaste}
                 disabled={loading}
-                className="absolute top-3 right-3 flex items-center gap-1 text-xs text-[#8B95AB] hover:text-[#E8ECF4] bg-white/5 hover:bg-white/10 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-0"
+                className="absolute top-3 right-3 flex items-center gap-1 text-xs text-[#8B95AB] hover:text-[#1a1a2e] bg-white/5 hover:bg-white/10 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-0"
               >
                 <ClipboardPaste className="w-3.5 h-3.5" />
                 {t.pasteBtn}
@@ -269,7 +269,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-[#131B2E] p-5 sm:p-6">
+            <div className="rounded-2xl border border-white/10 bg-[#f5f5f5] p-5 sm:p-6">
               <span className="text-xs uppercase tracking-wider text-[#8B95AB] mb-3 block">{t.redFlagsTitle}</span>
               {result.red_flags.length === 0 ? (
                 <p className="text-sm text-[#8B95AB] flex items-center gap-1.5">
@@ -293,7 +293,7 @@ export default function App() {
 
             <button
               onClick={reset}
-              className="w-full rounded-2xl border border-white/10 hover:bg-white/5 text-[#E8ECF4] font-medium py-3.5 sm:py-4 text-sm sm:text-base transition-colors"
+              className="w-full rounded-2xl border border-white/10 hover:bg-white/5 text-[#1a1a2e] font-medium py-3.5 sm:py-4 text-sm sm:text-base transition-colors"
             >
               {t.newScan}
             </button>
