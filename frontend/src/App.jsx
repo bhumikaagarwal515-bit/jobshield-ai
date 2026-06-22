@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Shield, AlertTriangle, CheckCircle2, AlertCircle, Loader2, Languages, ClipboardPaste } from "lucide-react";
 
 // ---------------------------------------------------------
-// BILINGUAL TEXT — sab UI strings yahin se aate hain
+// BILINGUAL TEXT
 // ---------------------------------------------------------
 const TEXT = {
   en: {
@@ -38,12 +38,10 @@ const TEXT = {
 };
 
 // ---------------------------------------------------------
-// DUMMY RESPONSE — Person 1 ka real backend ready hone tak
-// isi se UI test karo. Jab backend ready ho, callAnalyzeAPI()
-// function ke andar wala fetch() uncomment/replace kar dena.
+// API CALL
 // ---------------------------------------------------------
 async function callAnalyzeAPI(jobText) {
-  // ---- REAL BACKEND CALL (Person 1 ka kaam ho jaaye tab ye use karo) ----
+  // ---- REAL BACKEND CALL (uncomment when Person 1 backend ready) ----
   // const res = await fetch("http://localhost:8000/analyze", {
   //   method: "POST",
   //   headers: { "Content-Type": "application/json" },
@@ -52,7 +50,7 @@ async function callAnalyzeAPI(jobText) {
   // if (!res.ok) throw new Error("Server error");
   // return await res.json();
 
-  // ---- DUMMY DATA (testing ke liye, isse pehle delete mat karna) ----
+  // ---- DUMMY DATA ----
   await new Promise((r) => setTimeout(r, 1600));
   const isFraud = jobText.toLowerCase().includes("fee") || jobText.toLowerCase().includes("upfront");
   return isFraud
@@ -66,36 +64,44 @@ async function callAnalyzeAPI(jobText) {
           "Contact only via personal WhatsApp number",
         ],
       }
-    : {
-        risk_score: 12,
-        verdict: "green",
-        red_flags: [],
-      };
+    : { risk_score: 12, verdict: "green", red_flags: [] };
 }
 
 // ---------------------------------------------------------
-// SMALL HELPERS
+// COLOUR PALETTE
+// Olive Green  → #5C6B3A  (primary actions, accents)
+// Light Olive  → #7A8C4E  (hover states)
+// Off-White    → #F7F5EF  (page background)
+// Card White   → #FFFFFF  (card surfaces)
+// Border       → #DDD9CE  (subtle borders)
+// Text Dark    → #2C2C1E  (headings)
+// Text Mid     → #5A5A42  (body)
+// Text Light   → #8C8C72  (hints/labels)
 // ---------------------------------------------------------
+
 const VERDICT_STYLES = {
   green: {
-    ring: "ring-emerald-400/40",
-    bg: "bg-emerald-500/10",
-    text: "text-emerald-400",
-    bar: "bg-emerald-400",
+    ring: "ring-2 ring-emerald-400/50",
+    bg: "bg-emerald-50",
+    text: "text-emerald-700",
+    bar: "bg-emerald-500",
+    border: "border-emerald-200",
     icon: CheckCircle2,
   },
   yellow: {
-    ring: "ring-amber-400/40",
-    bg: "bg-amber-500/10",
-    text: "text-amber-400",
-    bar: "bg-amber-400",
+    ring: "ring-2 ring-amber-400/50",
+    bg: "bg-amber-50",
+    text: "text-amber-700",
+    bar: "bg-amber-500",
+    border: "border-amber-200",
     icon: AlertCircle,
   },
   red: {
-    ring: "ring-red-400/40",
-    bg: "bg-red-500/10",
-    text: "text-red-400",
-    bar: "bg-red-400",
+    ring: "ring-2 ring-red-400/50",
+    bg: "bg-red-50",
+    text: "text-red-700",
+    bar: "bg-red-500",
+    border: "border-red-200",
     icon: AlertTriangle,
   },
 };
@@ -104,6 +110,61 @@ function scoreToVerdict(score) {
   if (score >= 70) return "red";
   if (score >= 40) return "yellow";
   return "green";
+}
+
+// ---------------------------------------------------------
+// JOBSHIELD LOGO COMPONENT
+// ---------------------------------------------------------
+function JobShieldLogo() {
+  return (
+    <div className="flex items-center gap-2.5">
+      {/* Shield with subtle green glow behind it */}
+      <div className="relative flex items-center justify-center">
+        {/* Green trust circle behind shield */}
+        <div
+          className="absolute w-10 h-10 rounded-full"
+          style={{ background: "radial-gradient(circle, #7A8C4E55 0%, #5C6B3A22 60%, transparent 100%)" }}
+        />
+        {/* Outer ring */}
+        <div
+          className="absolute w-9 h-9 rounded-full border-2"
+          style={{ borderColor: "#5C6B3A33" }}
+        />
+        {/* Shield icon */}
+        <Shield
+          className="relative w-7 h-7"
+          style={{ color: "#5C6B3A" }}
+          strokeWidth={2}
+          fill="#5C6B3A18"
+        />
+        {/* Small checkmark dot at bottom of shield */}
+        <div
+          className="absolute bottom-0 right-0 w-3 h-3 rounded-full flex items-center justify-center"
+          style={{ background: "#5C6B3A", border: "1.5px solid #F7F5EF" }}
+        >
+          <svg width="7" height="7" viewBox="0 0 7 7" fill="none">
+            <path d="M1.5 3.5L3 5L5.5 2" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      {/* Brand name */}
+      <div className="flex flex-col leading-none">
+        <span
+          className="font-bold text-base sm:text-lg tracking-tight"
+          style={{ color: "#2C2C1E", fontFamily: "'Space Grotesk', system-ui, sans-serif", letterSpacing: "-0.02em" }}
+        >
+          Job<span style={{ color: "#5C6B3A" }}>Shield</span>
+        </span>
+        <span
+          className="text-[9px] font-medium tracking-widest uppercase"
+          style={{ color: "#8C8C72" }}
+        >
+          AI Verified
+        </span>
+      </div>
+    </div>
+  );
 }
 
 // ---------------------------------------------------------
@@ -130,7 +191,7 @@ export default function App() {
       const data = await callAnalyzeAPI(jobText);
       const verdict = data.verdict || scoreToVerdict(data.risk_score);
       setResult({ ...data, verdict });
-    } catch (e) {
+    } catch {
       setError("Something went wrong. Try again.");
     } finally {
       setLoading(false);
@@ -142,7 +203,7 @@ export default function App() {
       const clip = await navigator.clipboard.readText();
       setJobText(clip);
     } catch {
-      // clipboard permission denied — silently ignore
+      // clipboard permission denied
     }
   }
 
@@ -153,33 +214,42 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-[#1a1a2e] flex flex-col items-center px-4 py-10 sm:py-16">
+    <div
+      className="min-h-screen flex flex-col items-center px-4 py-10 sm:py-16"
+      style={{ background: "#F7F5EF", color: "#2C2C1E" }}
+    >
       {/* ---------- HEADER ---------- */}
-      <header className="w-full max-w-2xl flex items-center justify-between mb-8 sm:mb-12">
-        <div className="flex items-center gap-2.5">
-          <div className="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center">
-            <Shield className="w-9 h-9 sm:w-10 sm:h-10 text-[#4F8EF7]" strokeWidth={1.6} fill="rgba(79,142,247,0.12)" />
-          </div>
-          <span className="font-semibold text-lg sm:text-xl tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-            {t.brand}
-          </span>
-        </div>
+      <header className="w-full max-w-2xl flex items-center justify-between mb-10 sm:mb-14">
+        <JobShieldLogo />
 
         <button
           onClick={() => setLang(lang === "en" ? "hi" : "en")}
-          className="flex items-center gap-1.5 text-xs sm:text-sm px-3 py-1.5 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
+          className="flex items-center gap-1.5 text-xs sm:text-sm px-3.5 py-2 rounded-full border font-medium transition-colors"
+          style={{
+            borderColor: "#DDD9CE",
+            background: "#FFFFFF",
+            color: "#5A5A42",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#5C6B3A"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#5C6B3A"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.color = "#5A5A42"; e.currentTarget.style.borderColor = "#DDD9CE"; }}
         >
           <Languages className="w-3.5 h-3.5" />
           {lang === "en" ? "हिंदी" : "English"}
         </button>
       </header>
 
+      {/* ---------- HERO LINE ---------- */}
+      <div className="w-full max-w-2xl mb-6">
+        <p className="text-sm sm:text-base" style={{ color: "#5A5A42" }}>{t.tagline}</p>
+      </div>
+
       {/* ---------- MAIN CARD ---------- */}
       <main className="w-full max-w-2xl">
-        <p className="text-[#8B95AB] text-sm sm:text-base mb-5 sm:mb-6">{t.tagline}</p>
-
         {!result && (
-          <div className="space-y-3">
+          <div
+            className="rounded-2xl p-6 sm:p-8 space-y-4"
+            style={{ background: "#FFFFFF", border: "1px solid #DDD9CE", boxShadow: "0 2px 12px 0 #2C2C1E0A" }}
+          >
             <div className="relative">
               <textarea
                 value={jobText}
@@ -187,12 +257,26 @@ export default function App() {
                 placeholder={t.placeholder}
                 rows={9}
                 disabled={loading}
-                className="w-full resize-none rounded-2xl bg-[#f5f5f5] border border-white/10 focus:border-[#4F8EF7]/60 focus:ring-2 focus:ring-[#4F8EF7]/20 outline-none p-4 sm:p-5 text-sm sm:text-base placeholder:text-[#5C6479] transition-colors disabled:opacity-50"
+                className="w-full resize-none rounded-xl outline-none p-4 sm:p-5 text-sm sm:text-base transition-colors disabled:opacity-50"
+                style={{
+                  background: "#F7F5EF",
+                  border: "1.5px solid #DDD9CE",
+                  color: "#2C2C1E",
+                  fontFamily: "system-ui, sans-serif",
+                }}
+                onFocus={e => { e.currentTarget.style.borderColor = "#5C6B3A"; e.currentTarget.style.boxShadow = "0 0 0 3px #5C6B3A18"; }}
+                onBlur={e => { e.currentTarget.style.borderColor = "#DDD9CE"; e.currentTarget.style.boxShadow = "none"; }}
               />
+              {/* Placeholder text color fix via inline style */}
+              <style>{`textarea::placeholder { color: #A0A08A; }`}</style>
+
               <button
                 onClick={handlePaste}
                 disabled={loading}
-                className="absolute top-3 right-3 flex items-center gap-1 text-xs text-[#8B95AB] hover:text-[#1a1a2e] bg-white/5 hover:bg-white/10 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-0"
+                className="absolute top-3 right-3 flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-0"
+                style={{ background: "#F0EDE4", color: "#5C6B3A", border: "1px solid #DDD9CE" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "#5C6B3A"; e.currentTarget.style.color = "#fff"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "#F0EDE4"; e.currentTarget.style.color = "#5C6B3A"; }}
               >
                 <ClipboardPaste className="w-3.5 h-3.5" />
                 {t.pasteBtn}
@@ -200,7 +284,7 @@ export default function App() {
             </div>
 
             {error && (
-              <p className="text-red-400 text-sm flex items-center gap-1.5 animate-[slideInFromLeft_0.2s_ease-out]">
+              <p className="text-red-600 text-sm flex items-center gap-1.5">
                 <AlertCircle className="w-4 h-4" /> {error}
               </p>
             )}
@@ -208,20 +292,20 @@ export default function App() {
             <button
               onClick={handleAnalyze}
               disabled={loading}
-              className="w-full relative overflow-hidden rounded-2xl bg-[#4F8EF7] hover:bg-[#3F7DE0] disabled:bg-[#4F8EF7]/60 text-white font-medium py-3.5 sm:py-4 text-sm sm:text-base transition-colors flex items-center justify-center gap-2"
+              className="w-full rounded-xl font-semibold py-3.5 sm:py-4 text-sm sm:text-base transition-all flex items-center justify-center gap-2"
+              style={{
+                background: loading ? "#8C9E6A" : "#5C6B3A",
+                color: "#FFFFFF",
+                letterSpacing: "0.01em",
+                boxShadow: loading ? "none" : "0 2px 8px #5C6B3A44",
+              }}
+              onMouseEnter={e => { if (!loading) e.currentTarget.style.background = "#4A5A2E"; }}
+              onMouseLeave={e => { if (!loading) e.currentTarget.style.background = "#5C6B3A"; }}
             >
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span
-                    className="bg-clip-text text-transparent bg-[length:200%_100%]"
-                    style={{
-                      backgroundImage: "linear-gradient(90deg, #ffffffaa 0%, #ffffff 50%, #ffffffaa 100%)",
-                      animation: "shimmer 1.6s linear infinite",
-                    }}
-                  >
-                    {t.analyzing}
-                  </span>
+                  {t.analyzing}
                 </>
               ) : (
                 <>
@@ -235,14 +319,16 @@ export default function App() {
 
         {/* ---------- RESULT ---------- */}
         {result && (
-          <div className="animate-[slideInFromRight_0.35s_ease-out] space-y-5">
+          <div className="space-y-4 animate-[slideInFromRight_0.35s_ease-out]">
+            {/* Verdict Card */}
             <div
-              className={`rounded-2xl border ${VERDICT_STYLES[result.verdict].ring} ${VERDICT_STYLES[result.verdict].bg} p-5 sm:p-6 ${
-                result.verdict === "red" ? "animate-[shake_0.5s_ease-in-out]" : ""
-              }`}
+              className={`rounded-2xl border p-5 sm:p-6 ${VERDICT_STYLES[result.verdict].bg} ${VERDICT_STYLES[result.verdict].border} ${VERDICT_STYLES[result.verdict].ring}`}
+              style={{ boxShadow: "0 2px 12px 0 #2C2C1E0A" }}
             >
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs uppercase tracking-wider text-[#8B95AB]">{t.resultTitle}</span>
+                <span className="text-xs uppercase tracking-wider font-medium" style={{ color: "#8C8C72" }}>
+                  {t.resultTitle}
+                </span>
                 {(() => {
                   const Icon = VERDICT_STYLES[result.verdict].icon;
                   return (
@@ -255,13 +341,16 @@ export default function App() {
               </div>
 
               <div className="mb-1.5 flex items-baseline justify-between">
-                <span className="text-sm text-[#8B95AB]">{t.riskScore}</span>
-                <span className={`text-2xl font-semibold ${VERDICT_STYLES[result.verdict].text}`} style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                <span className="text-sm font-medium" style={{ color: "#5A5A42" }}>{t.riskScore}</span>
+                <span
+                  className={`text-2xl font-bold ${VERDICT_STYLES[result.verdict].text}`}
+                  style={{ fontFamily: "'Space Grotesk', system-ui, sans-serif" }}
+                >
                   {result.risk_score}
-                  <span className="text-sm text-[#5C6479]">/100</span>
+                  <span className="text-sm font-normal" style={{ color: "#8C8C72" }}>/100</span>
                 </span>
               </div>
-              <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: "#E8E5DC" }}>
                 <div
                   className={`h-full rounded-full ${VERDICT_STYLES[result.verdict].bar} transition-all duration-700 ease-out`}
                   style={{ width: `${result.risk_score}%` }}
@@ -269,21 +358,27 @@ export default function App() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-[#f5f5f5] p-5 sm:p-6">
-              <span className="text-xs uppercase tracking-wider text-[#8B95AB] mb-3 block">{t.redFlagsTitle}</span>
+            {/* Red Flags Card */}
+            <div
+              className="rounded-2xl p-5 sm:p-6"
+              style={{ background: "#FFFFFF", border: "1px solid #DDD9CE", boxShadow: "0 2px 12px 0 #2C2C1E0A" }}
+            >
+              <span className="text-xs uppercase tracking-wider font-medium mb-3 block" style={{ color: "#8C8C72" }}>
+                {t.redFlagsTitle}
+              </span>
               {result.red_flags.length === 0 ? (
-                <p className="text-sm text-[#8B95AB] flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" /> {t.noFlags}
+                <p className="text-sm flex items-center gap-1.5" style={{ color: "#5A5A42" }}>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" /> {t.noFlags}
                 </p>
               ) : (
                 <ul className="space-y-2.5">
                   {result.red_flags.map((flag, i) => (
                     <li
                       key={i}
-                      className="flex items-start gap-2.5 text-sm sm:text-base text-[#D4D9E5] animate-[slideInFromLeft_0.25s_ease-out]"
-                      style={{ animationDelay: `${i * 60}ms`, animationFillMode: "backwards" }}
+                      className="flex items-start gap-2.5 text-sm sm:text-base animate-[slideInFromLeft_0.25s_ease-out]"
+                      style={{ color: "#2C2C1E", animationDelay: `${i * 60}ms`, animationFillMode: "backwards" }}
                     >
-                      <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-red-400" />
+                      <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-red-500" />
                       {flag}
                     </li>
                   ))}
@@ -291,15 +386,29 @@ export default function App() {
               )}
             </div>
 
+            {/* New Scan Button */}
             <button
               onClick={reset}
-              className="w-full rounded-2xl border border-white/10 hover:bg-white/5 text-[#1a1a2e] font-medium py-3.5 sm:py-4 text-sm sm:text-base transition-colors"
+              className="w-full rounded-xl border font-medium py-3.5 sm:py-4 text-sm sm:text-base transition-colors"
+              style={{ borderColor: "#DDD9CE", background: "#FFFFFF", color: "#5A5A42" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#5C6B3A"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#5C6B3A"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.color = "#5A5A42"; e.currentTarget.style.borderColor = "#DDD9CE"; }}
             >
               {t.newScan}
             </button>
           </div>
         )}
       </main>
+
+      {/* ---------- FOOTER TRUST BAR ---------- */}
+      <footer className="mt-12 flex items-center gap-2 text-xs" style={{ color: "#8C8C72" }}>
+        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#5C6B3A" }} />
+        AI-powered fraud detection
+        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#5C6B3A" }} />
+        No data stored
+        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#5C6B3A" }} />
+        Free to use
+      </footer>
     </div>
   );
 }
