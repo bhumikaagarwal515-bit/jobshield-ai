@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 // ---------------------------------------------------------
-// BILINGUAL TEXT — sab UI strings yahin se aate hain
+// BILINGUAL TEXT
 // ---------------------------------------------------------
 const TEXT = {
   en: {
@@ -122,7 +122,7 @@ const TEXT = {
 
     // Welcome
     welcomeBack: "स्वागत है",
-    welcomeSub: "आपको यहां देखकर खुशी हुई। चलिए सेटअप करते हैं।",
+    welcomeSub: "आपको यहां देखकर खुशी हुई। चलिएं सेटअप करते हैं।",
     continueBtn: "आगे बढ़ें",
 
     // Onboarding
@@ -160,16 +160,7 @@ const TEXT = {
 // ---------------------------------------------------------
 async function callAnalyzeAPI(jobText) {
   const systemPrompt = `You are JobShield AI, a fraud detector for job postings aimed at Indian job seekers. 
-Analyze the given job posting text and respond with ONLY a JSON object, no preamble, no markdown fences, no explanation.
-
-JSON shape:
-{
-  "risk_score": number (0-100, higher = more likely fraud),
-  "verdict": "green" | "yellow" | "red",
-  "red_flags": string[] (short, specific reasons; empty array if none found)
-}
-
-Rules for verdict: green = 0-39, yellow = 40-69, red = 70-100.`;
+Analyze the given job posting text and respond with ONLY a JSON object, no preamble, no markdown fences, no explanation.`;
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -186,7 +177,8 @@ Rules for verdict: green = 0-39, yellow = 40-69, red = 70-100.`;
   const data = await res.json();
   const textBlock = data.content.find((c) => c.type === "text");
   const raw = (textBlock?.text || "").trim();
-  const cleaned = raw.replace(/```json|```/g, "").trim();
+  const cleaned = raw.replace(/```json|
+```/g, "").trim();
   const parsed = JSON.parse(cleaned);
 
   return {
@@ -228,7 +220,7 @@ async function saveHistory(history) {
 }
 
 // ---------------------------------------------------------
-// AUTH SCREEN — Balanced Light Blue & White Centered Card
+// AUTH SCREEN — EXACT MATCH TO image_8259e3.png WITH LIGHT BLUE BUTTONS
 // ---------------------------------------------------------
 function AuthScreen({ lang, setLang, onAuthed }) {
   const t = TEXT[lang];
@@ -254,98 +246,104 @@ function AuthScreen({ lang, setLang, onAuthed }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-gray-900 flex flex-col items-center justify-center px-4 py-8">
-      {/* Container to keep layout clean, centered, and slightly compact */}
-      <div className="w-full max-w-md bg-white border border-blue-100 rounded-3xl p-6 sm:p-8 shadow-md">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2">
-            <Shield className="w-8 h-8 text-blue-500" strokeWidth={2} fill="rgba(59,130,246,0.1)" />
-            <span className="font-bold text-xl text-gray-900 tracking-tight">
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col items-center justify-center p-6">
+      
+      <div className="w-full max-w-lg mx-auto bg-white p-2 sm:p-4">
+        
+        
+        <div className="flex items-center justify-between mb-10">
+          <div className="flex items-center gap-3">
+            <Shield className="w-10 h-10 text-gray-900" strokeWidth="{2}" fill="rgba(219,234,254,0.5)"/>
+            <span className="font-bold text-2xl text-gray-900 tracking-tight">
               {t.brand}
             </span>
           </div>
           <button
             onClick={() => setLang(lang === "en" ? "hi" : "en")}
-            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+            className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-full border border-gray-200 bg-white text-gray-800 hover:bg-gray-50 transition-colors"
           >
-            <Languages className="w-3.5 h-3.5" />
+            <Languages className="w-4 h-4 text-gray-700"/>
             {lang === "en" ? "हिंदी" : "English"}
           </button>
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+        
+        <h1 className="text-4xl font-bold text-gray-900 mb-3 tracking-tight">
           {mode === "login" ? t.loginTitle : t.signupTitle}
         </h1>
-        <p className="text-gray-600 text-sm mb-6 font-medium">{t.tagline}</p>
+        <p className="text-gray-700 text-lg mb-8 font-normal">{t.tagline}</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
           {mode === "signup" && (
             <div>
-              <label className="text-xs font-bold text-gray-700 mb-1.5 block">{t.nameLabel}</label>
+              <label className="text-base font-medium text-gray-900 mb-2 block">{t.nameLabel}</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={t.namePlaceholder}
-                className="w-full rounded-xl bg-white border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 font-medium transition-colors"
+                className="w-full rounded-2xl bg-white border border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 focus:outline-none px-5 py-4 text-base text-gray-900 placeholder:text-gray-400 transition-all"
               />
             </div>
           )}
 
           <div>
-            <label className="text-xs font-bold text-gray-700 mb-1.5 block">{t.emailLabel}</label>
+            <label className="text-base font-medium text-gray-900 mb-2 block">{t.emailLabel}</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={t.emailPlaceholder}
-              className="w-full rounded-xl bg-white border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 font-medium transition-colors"
+              className="w-full rounded-2xl bg-white border border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 focus:outline-none px-5 py-4 text-base text-gray-900 placeholder:text-gray-400 transition-all"
             />
           </div>
 
           <div>
-            <label className="text-xs font-bold text-gray-700 mb-1.5 block">{t.passwordLabel}</label>
+            <label className="text-base font-medium text-gray-900 mb-2 block">{t.passwordLabel}</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={t.passwordPlaceholder}
-                className="w-full rounded-xl bg-white border-2 border-gray-200 focus:border-blue-500 focus:outline-none px-4 py-3 pr-11 text-sm text-gray-900 placeholder:text-gray-400 font-medium transition-colors"
+                className="w-full rounded-2xl bg-white border border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 focus:outline-none px-5 py-4 pr-12 text-base text-gray-900 placeholder:text-gray-400 transition-all"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-800 hover:text-gray-900"
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? <EyeOff className="w-5 h-5"/> : <Eye className="w-5 h-5"/>}
               </button>
             </div>
           </div>
 
           {error && (
-            <p className="text-red-600 text-xs font-semibold flex items-center gap-1.5 bg-red-50 p-2.5 rounded-xl border border-red-200">
-              <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+            <p className="text-red-600 text-sm font-medium flex items-center gap-2 bg-red-50 p-3 rounded-xl border border-red-200">
+              <AlertCircle className="w-5 h-5 shrink-0"/> {error}
             </p>
           )}
 
+          
           <button
             type="submit"
-            className="w-full rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-bold py-3.5 text-sm shadow-sm transition-colors flex items-center justify-center gap-2 mt-2"
+            className="w-full rounded-2xl bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 text-base shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 mt-4"
           >
-            <Shield className="w-4 h-4" />
+            <Shield className="w-5 h-5"/>
             {mode === "login" ? t.loginBtn : t.signupBtn}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-600 mt-5 font-medium">
+        
+        <p className="text-center text-base text-gray-900 mt-8 font-normal">
           {mode === "login" ? t.noAccount : t.haveAccount}{" "}
           <button
             onClick={() => {
               setMode(mode === "login" ? "signup" : "login");
               setError("");
             }}
-            className="text-blue-600 font-bold hover:underline ml-1"
+            className="text-gray-900 font-bold hover:underline ml-1"
           >
             {mode === "login" ? t.switchToSignup : t.switchToLogin}
           </button>
@@ -361,18 +359,18 @@ function AuthScreen({ lang, setLang, onAuthed }) {
 function WelcomeScreen({ lang, user, onContinue }) {
   const t = TEXT[lang];
   return (
-    <div className="min-h-screen bg-slate-50 text-gray-900 flex flex-col items-center justify-center px-4 py-10">
-      <div className="w-full max-w-sm text-center bg-white border border-blue-100 rounded-3xl p-8 shadow-md">
-        <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-5 border border-blue-100">
-          <Shield className="w-8 h-8 text-blue-500" strokeWidth={2} />
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col items-center justify-center p-6">
+      <div className="w-full max-w-md text-center bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
+        <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-6 border border-blue-100">
+          <Shield className="w-8 h-8 text-blue-500" strokeWidth="{2}"/>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">
           {t.welcomeBack}, {user.name} 👋
         </h1>
-        <p className="text-gray-600 text-sm mb-6 font-medium">{t.welcomeSub}</p>
+        <p className="text-gray-600 text-base mb-8 font-medium">{t.welcomeSub}</p>
         <button
           onClick={onContinue}
-          className="w-full rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-bold py-3.5 text-sm shadow-sm transition-colors"
+          className="w-full rounded-2xl bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 text-base shadow-sm transition-colors"
         >
           {t.continueBtn}
         </button>
@@ -398,48 +396,48 @@ function OnboardingSlides({ lang, onDone }) {
   const { Icon, title, body } = slides[step];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-gray-900 flex flex-col items-center justify-center px-4 py-10">
-      <div className="w-full max-w-sm bg-white border border-blue-100 rounded-3xl p-6 shadow-md">
-        <div className="flex justify-end mb-2">
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col items-center justify-center p-6">
+      <div className="w-full max-w-md bg-white border border-gray-100 rounded-3xl p-6 shadow-sm">
+        <div className="flex justify-end mb-4">
           {!isLast && (
-            <button onClick={onDone} className="text-xs font-bold text-gray-400 hover:text-blue-500 transition-colors">
+            <button onClick={onDone} className="text-sm font-bold text-gray-400 hover:text-blue-500 transition-colors">
               {t.skip}
             </button>
           )}
         </div>
 
-        <div className="flex flex-col items-center text-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mb-4 border border-blue-100">
-            <Icon className="w-8 h-8 text-blue-500" strokeWidth={2} />
+        <div className="flex flex-col items-center text-center mb-8">
+          <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mb-5 border border-blue-100">
+            <Icon className="w-8 h-8 text-blue-500" strokeWidth="{2}"/>
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">{title}</h2>
-          <p className="text-gray-600 text-sm font-medium leading-relaxed px-2">{body}</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">{title}</h2>
+          <p className="text-gray-600 text-base font-medium leading-relaxed px-4">{body}</p>
         </div>
 
-        <div className="flex items-center justify-center gap-2 mb-6">
+        <div className="flex items-center justify-center gap-2 mb-8">
           {slides.map((_, i) => (
             <div
               key={i}
-              className={`h-1.5 rounded-full transition-all ${i === step ? "w-6 bg-blue-500" : "w-1.5 bg-blue-200"}`}
+              className={`h-2 rounded-full transition-all ${i === step ? "w-8 bg-blue-500" : "w-2 bg-blue-200"}`}
             />
           ))}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {step > 0 && (
             <button
               onClick={() => setStep((s) => s - 1)}
-              className="flex-1 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold py-3 text-sm transition-colors flex items-center justify-center gap-1.5"
+              className="flex-1 rounded-2xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold py-3.5 text-base transition-colors flex items-center justify-center gap-2"
             >
-              <ChevronLeft className="w-4 h-4" /> {t.back}
+              <ChevronLeft className="w-5 h-5"/> {t.back}
             </button>
           )}
           <button
             onClick={() => (isLast ? onDone() : setStep((s) => s + 1))}
-            className="flex-1 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 text-sm shadow-sm transition-colors flex items-center justify-center gap-1.5"
+            className="flex-1 rounded-2xl bg-blue-500 hover:bg-blue-600 text-white font-bold py-3.5 text-base shadow-sm transition-colors flex items-center justify-center gap-2"
           >
             {isLast ? t.getStarted : t.next}
-            {!isLast && <ChevronRight className="w-4 h-4" />}
+            {!isLast && <ChevronRight className="w-5 h-5"/>}
           </button>
         </div>
       </div>
@@ -460,10 +458,10 @@ function Sidebar({ lang, user, page, setPage, onLogout, mobileOpen, setMobileOpe
   const content = (
     <div className="flex flex-col h-full bg-white">
       <div className="flex items-center gap-2 px-5 py-5 border-b border-gray-100">
-        <Shield className="w-7 h-7 text-blue-500" strokeWidth={2} fill="rgba(59,130,246,0.1)" />
+        <Shield className="w-7 h-7 text-blue-500" strokeWidth="{2}" fill="rgba(59,130,246,0.1)"/>
         <span className="font-bold text-base text-gray-900 tracking-tight">{t.brand}</span>
         <button onClick={() => setMobileOpen(false)} className="ml-auto md:hidden text-gray-500">
-          <X className="w-5 h-5" />
+          <X className="w-5 h-5"/>
         </button>
       </div>
 
@@ -476,7 +474,7 @@ function Sidebar({ lang, user, page, setPage, onLogout, mobileOpen, setMobileOpe
               page === key ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"
             }`}
           >
-            <Icon className="w-4.5 h-4.5" /> {label}
+            <Icon className="w-4.5 h-4.5"/> {label}
           </button>
         ))}
       </nav>
@@ -495,7 +493,7 @@ function Sidebar({ lang, user, page, setPage, onLogout, mobileOpen, setMobileOpe
           onClick={onLogout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors"
         >
-          <LogOut className="w-4.5 h-4.5" /> {t.logout}
+          <LogOut className="w-4.5 h-4.5"/> {t.logout}
         </button>
       </div>
     </div>
@@ -524,7 +522,7 @@ function Topbar({ lang, setLang, user, title, onMenuClick }) {
     <header className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100 bg-white sticky top-0 z-30">
       <div className="flex items-center gap-3">
         <button onClick={onMenuClick} className="md:hidden text-gray-600">
-          <Menu className="w-5 h-5" />
+          <Menu className="w-5 h-5"/>
         </button>
         <h1 className="text-base sm:text-lg font-bold text-gray-900">{title}</h1>
       </div>
@@ -533,7 +531,7 @@ function Topbar({ lang, setLang, user, title, onMenuClick }) {
           onClick={() => setLang(lang === "en" ? "hi" : "en")}
           className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
         >
-          <Languages className="w-3.5 h-3.5" />
+          <Languages className="w-3.5 h-3.5"/>
           {lang === "en" ? "हिंदी" : "English"}
         </button>
         <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-xs font-bold text-blue-600">
@@ -597,13 +595,13 @@ function AnalyzePage({ lang, onScanSaved }) {
               disabled={loading}
               className="absolute top-3 right-3 flex items-center gap-1 text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-1.5 rounded-xl hover:bg-blue-100 transition-colors"
             >
-              <ClipboardPaste className="w-3.5 h-3.5" /> {t.pasteBtn}
+              <ClipboardPaste className="w-3.5 h-3.5"/> {t.pasteBtn}
             </button>
           </div>
 
           {error && (
             <p className="text-red-600 text-xs font-semibold flex items-center gap-1.5 bg-red-50 p-2.5 rounded-xl border border-red-100">
-              <AlertCircle className="w-4 h-4" /> {error}
+              <AlertCircle className="w-4 h-4"/> {error}
             </p>
           )}
 
@@ -614,17 +612,17 @@ function AnalyzePage({ lang, onScanSaved }) {
           >
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" /> <span>{t.analyzing}</span>
+                <Loader2 className="w-4 h-4 animate-spin"/> <span>{t.analyzing}</span>
               </>
             ) : (
               <>
-                <Shield className="w-4 h-4" /> {t.analyzeBtn}
+                <Shield className="w-4 h-4"/> {t.analyzeBtn}
               </>
             )}
           </button>
         </div>
       )}
-      {result && <ResultCard lang={lang} result={result} onReset={() => { setResult(null); setJobText(""); }} footerLabel={t.newScan} />}
+      {result && <ResultCard lang="{lang}" result="{result}" onReset="{()"> { setResult(null); setJobText(""); }} footerLabel={t.newScan} />}
     </div>
   );
 }
@@ -643,7 +641,7 @@ function ResultCard({ lang, result, onReset, footerLabel }) {
             const Icon = VERDICT_STYLES[result.verdict].icon;
             return (
               <span className={`flex items-center gap-1.5 text-sm font-bold ${VERDICT_STYLES[result.verdict].text}`}>
-                <Icon className="w-4 h-4" /> {t.verdicts[result.verdict]}
+                <Icon className="w-4 h-4"/> {t.verdicts[result.verdict]}
               </span>
             );
           })()}
@@ -663,13 +661,13 @@ function ResultCard({ lang, result, onReset, footerLabel }) {
         <span className="text-xs uppercase font-bold text-gray-500 tracking-wider mb-3 block">{t.redFlagsTitle}</span>
         {result.red_flags.length === 0 ? (
           <p className="text-sm font-bold text-emerald-600 flex items-center gap-1.5">
-            <CheckCircle2 className="w-4 h-4" /> {t.noFlags}
+            <CheckCircle2 className="w-4 h-4"/> {t.noFlags}
           </p>
         ) : (
           <ul className="space-y-2">
             {result.red_flags.map((flag, i) => (
               <li key={i} className="flex items-start gap-2.5 text-sm font-semibold text-gray-800">
-                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-red-500" /> {flag}
+                <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-red-500"/> {flag}
               </li>
             ))}
           </ul>
@@ -700,13 +698,13 @@ function HistoryPage({ lang, history, setHistory }) {
     return (
       <div className="w-full max-w-2xl bg-white border border-gray-100 rounded-3xl p-5 shadow-sm">
         <button onClick={() => setSelected(null)} className="flex items-center gap-1.5 text-sm font-bold text-blue-600 mb-4">
-          <ChevronLeft className="w-4 h-4" /> {t.backToHistory}
+          <ChevronLeft className="w-4 h-4"/> {t.backToHistory}
         </button>
         <p className="text-xs font-bold text-gray-400 mb-3">{new Date(selected.timestamp).toLocaleString()}</p>
         <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 mb-4 text-sm font-medium text-gray-700 max-h-36 overflow-y-auto whitespace-pre-wrap">
           {selected.job_text}
         </div>
-        <ResultCard lang={lang} result={selected} />
+        <ResultCard lang="{lang}" result="{selected}"/>
       </div>
     );
   }
@@ -717,7 +715,7 @@ function HistoryPage({ lang, history, setHistory }) {
         <p className="text-gray-500 text-sm font-bold">{history.length > 0 ? `${history.length} scans` : ""}</p>
         {history.length > 0 && (
           <button onClick={() => setConfirmClear(true)} className="flex items-center gap-1.5 text-sm font-bold text-red-500 hover:text-red-600">
-            <Trash2 className="w-4 h-4" /> {t.clearHistory}
+            <Trash2 className="w-4 h-4"/> {t.clearHistory}
           </button>
         )}
       </div>
@@ -737,7 +735,7 @@ function HistoryPage({ lang, history, setHistory }) {
 
       {history.length === 0 ? (
         <div className="bg-gray-50 rounded-2xl p-10 text-center border border-gray-100">
-          <History className="w-8 h-8 text-gray-400 mx-auto mb-2" strokeWidth={2} />
+          <History className="w-8 h-8 text-gray-400 mx-auto mb-2" strokeWidth="{2}"/>
           <p className="text-sm font-bold text-gray-500">{t.historyEmpty}</p>
         </div>
       ) : (
@@ -751,7 +749,7 @@ function HistoryPage({ lang, history, setHistory }) {
                 className="w-full text-left rounded-xl border border-gray-100 hover:border-blue-200 bg-white p-4 transition-colors flex items-start gap-3"
               >
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${VERDICT_STYLES[item.verdict].bg}`}>
-                  <Icon className={`w-4.5 h-4.5 ${VERDICT_STYLES[item.verdict].text}`} />
+                  <Icon className="{`w-4.5" h-4.5 ${VERDICT_STYLES[item.verdict].text}`}/>
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold text-gray-900 truncate mb-0.5">{item.job_text}</p>
@@ -793,27 +791,27 @@ export default function App() {
   };
 
   if (stage === "auth") {
-    return <AuthScreen lang={lang} setLang={setLang} onAuthed={(userData) => { setUser(userData); setStage("welcome"); }} />;
+    return <AuthScreen lang="{lang}" setLang="{setLang}" onAuthed="{(userData)"> { setUser(userData); setStage("welcome"); }} />;
   }
   if (stage === "welcome") {
-    return <WelcomeScreen lang={lang} user={user} onContinue={() => setStage("onboarding")} />;
+    return <WelcomeScreen lang="{lang}" user="{user}" onContinue="{()"> setStage("onboarding")} />;
   }
   if (stage === "onboarding") {
-    return <OnboardingSlides lang={lang} onDone={() => setStage("dashboard")} />;
+    return <OnboardingSlides lang="{lang}" onDone="{()"> setStage("dashboard")} />;
   }
 
   const currentPageTitle = page === "analyze" ? TEXT[lang].navAnalyze : TEXT[lang].navHistory;
 
   return (
     <div className="min-h-screen bg-slate-50 text-gray-900 flex flex-col md:flex-row">
-      <Sidebar lang={lang} user={user} page={page} setPage={setPage} mobileOpen={mobileMenuOpen} setMobileOpen={setMobileMenuOpen} onLogout={() => { setStage("auth"); setUser(null); }} />
+      <Sidebar lang="{lang}" user="{user}" page="{page}" setPage="{setPage}" mobileOpen="{mobileMenuOpen}" setMobileOpen="{setMobileMenuOpen}" onLogout="{()"> { setStage("auth"); setUser(null); }} />
       <div className="flex-1 flex flex-col min-w-0">
-        <Topbar lang={lang} setLang={setLang} user={user} title={currentPageTitle} onMenuClick={() => setMobileMenuOpen(true)} />
+        <Topbar lang="{lang}" setLang="{setLang}" user="{user}" title="{currentPageTitle}" onMenuClick="{()"> setMobileMenuOpen(true)} />
         <main className="p-4 sm:p-6 max-w-4xl w-full mx-auto flex-1 flex flex-col items-center justify-start">
           {page === "analyze" ? (
-            <AnalyzePage lang={lang} onScanSaved={handleScanSaved} />
+            <AnalyzePage lang="{lang}" onScanSaved="{handleScanSaved}"/>
           ) : (
-            <HistoryPage lang={lang} history={history} setHistory={setHistory} />
+            <HistoryPage lang="{lang}" history="{history}" setHistory="{setHistory}"/>
           )}
         </main>
       </div>
