@@ -1,15 +1,14 @@
 import { useState } from "react";
-import { Shield, AlertTriangle, CheckCircle2, AlertCircle, Loader2, Languages, ClipboardPaste, ShieldCheck } from "lucide-react";
+import { AlertTriangle, CheckCircle2, AlertCircle, Loader2, Languages, ShieldCheck } from "lucide-react";
 
 const TEXT = {
   en: {
     brand: "JobShield AI",
-    tagline: "Paste a job posting. We'll tell you if it's safe.",
-    placeholder: "Paste the full job posting text here — company name, salary, description, contact details...",
+    tagline: "Verify any job posting instantly",
+    placeholder: "Paste the full job posting here — company name, salary, description, contact details...",
     analyzeBtn: "Analyze Posting",
     analyzing: "Scanning for red flags...",
-    pasteBtn: "Paste",
-    emptyError: "Paste a job posting first.",
+    emptyError: "Please paste a job posting first.",
     resultTitle: "Analysis Result",
     riskScore: "Risk Score",
     redFlagsTitle: "Red Flags Found",
@@ -19,11 +18,10 @@ const TEXT = {
   },
   hi: {
     brand: "JobShield AI",
-    tagline: "नौकरी की पोस्टिंग पेस्ट करें। हम बताएंगे यह सुरक्षित है या नहीं।",
+    tagline: "किसी भी जॉब पोस्टिंग को तुरंत जांचें",
     placeholder: "यहां पूरी जॉब पोस्टिंग पेस्ट करें — कंपनी का नाम, वेतन, विवरण, संपर्क विवरण...",
     analyzeBtn: "जांच करें",
     analyzing: "रेड फ्लैग्स खोजे जा रहे हैं...",
-    pasteBtn: "पेस्ट करें",
     emptyError: "पहले जॉब पोस्टिंग पेस्ट करें।",
     resultTitle: "जांच का परिणाम",
     riskScore: "जोखिम स्कोर",
@@ -47,48 +45,17 @@ async function callAnalyzeAPI(jobText) {
   await new Promise((r) => setTimeout(r, 1600));
   const isFraud = jobText.toLowerCase().includes("fee") || jobText.toLowerCase().includes("upfront");
   return isFraud
-    ? {
-        risk_score: 92,
-        verdict: "red",
-        red_flags: [
-          "Asks for upfront payment / registration fee",
-          "Unrealistic salary for the role described",
-          "Vague company name with no verifiable details",
-          "Contact only via personal WhatsApp number",
-        ],
-      }
+    ? { risk_score: 92, verdict: "red", red_flags: ["Asks for upfront payment / registration fee", "Unrealistic salary for the role described", "Vague company name with no verifiable details", "Contact only via personal WhatsApp number"] }
     : { risk_score: 12, verdict: "green", red_flags: [] };
 }
 
-const VERDICT_STYLES = {
-  green: {
-    border: "border-[#6B8C5A]",
-    bg: "bg-[#f0f5ec]",
-    text: "text-[#4a6b38]",
-    bar: "bg-[#6B8C5A]",
-    icon: CheckCircle2,
-  },
-  yellow: {
-    border: "border-amber-400",
-    bg: "bg-amber-50",
-    text: "text-amber-700",
-    bar: "bg-amber-400",
-    icon: AlertCircle,
-  },
-  red: {
-    border: "border-red-400",
-    bg: "bg-red-50",
-    text: "text-red-600",
-    bar: "bg-red-500",
-    icon: AlertTriangle,
-  },
+const STYLES = {
+  green: { border: "#6B8C5A", bg: "#f0f5ec", text: "#4a6b38", bar: "#6B8C5A", icon: CheckCircle2 },
+  yellow: { border: "#d97706", bg: "#fffbeb", text: "#b45309", bar: "#f59e0b", icon: AlertCircle },
+  red: { border: "#dc2626", bg: "#fff5f5", text: "#dc2626", bar: "#ef4444", icon: AlertTriangle },
 };
 
-function scoreToVerdict(score) {
-  if (score >= 70) return "red";
-  if (score >= 40) return "yellow";
-  return "green";
-}
+function scoreToVerdict(s) { return s >= 70 ? "red" : s >= 40 ? "yellow" : "green"; }
 
 export default function App() {
   const [lang, setLang] = useState("en");
@@ -96,7 +63,6 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
-
   const t = TEXT[lang];
 
   async function handleAnalyze() {
@@ -104,164 +70,121 @@ export default function App() {
     setError(""); setResult(null); setLoading(true);
     try {
       const data = await callAnalyzeAPI(jobText);
-      const verdict = data.verdict || scoreToVerdict(data.risk_score);
-      setResult({ ...data, verdict });
+      setResult({ ...data, verdict: data.verdict || scoreToVerdict(data.risk_score) });
     } catch { setError("Something went wrong. Try again."); }
     finally { setLoading(false); }
-  }
-
-  async function handlePaste() {
-    try { const clip = await navigator.clipboard.readText(); setJobText(clip); } catch {}
   }
 
   function reset() { setResult(null); setJobText(""); setError(""); }
 
   return (
-    <div className="min-h-screen flex flex-col items-center px-4 py-10 sm:py-16"
-      style={{ backgroundColor: "#F7F5F0", fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ minHeight: "100vh", backgroundColor: "#F2F0EB", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px", fontFamily: "'Inter', sans-serif" }}>
 
-      {/* HEADER */}
-      <header className="w-full max-w-2xl flex items-center justify-between mb-10 sm:mb-14">
-        <div className="flex items-center gap-3">
-          {/* LOGO — green trusted badge behind shield */}
-          <div className="relative flex items-center justify-center w-11 h-11">
-            <div className="absolute inset-0 rounded-full bg-[#6B8C5A] opacity-15"></div>
-            <div className="absolute inset-[3px] rounded-full bg-[#6B8C5A] opacity-10"></div>
-            <ShieldCheck className="w-7 h-7 text-[#4a6b38] relative z-10" strokeWidth={1.8} />
+      {/* TOP NAV */}
+      <div style={{ width: "100%", maxWidth: "480px", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px" }}>
+        {/* LOGO */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{ width: "38px", height: "38px", borderRadius: "50%", backgroundColor: "#e8f0e1", border: "2px solid #6B8C5A", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <ShieldCheck size={20} color="#4a6b38" strokeWidth={2} />
           </div>
           <div>
-            <span className="font-bold text-lg sm:text-xl text-[#2c3a20] tracking-tight block leading-tight"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-              JobShield AI
-            </span>
-            <span className="text-[10px] text-[#6B8C5A] font-medium tracking-widest uppercase">Trusted Job Verifier</span>
+            <div style={{ fontWeight: "700", fontSize: "16px", color: "#2c3a20", fontFamily: "'Space Grotesk', sans-serif", lineHeight: 1.1 }}>JobShield AI</div>
+            <div style={{ fontSize: "9px", color: "#6B8C5A", letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: "600" }}>Trusted Job Verifier</div>
           </div>
         </div>
 
-        <button
-          onClick={() => setLang(lang === "en" ? "hi" : "en")}
-          className="flex items-center gap-1.5 text-xs sm:text-sm px-3 py-1.5 rounded-full border transition-colors"
-          style={{ borderColor: "#c8d4bc", backgroundColor: "#edf0e8", color: "#4a6b38" }}
-        >
-          <Languages className="w-3.5 h-3.5" />
+        {/* LANG TOGGLE */}
+        <button onClick={() => setLang(lang === "en" ? "hi" : "en")}
+          style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", padding: "6px 14px", borderRadius: "20px", border: "1.5px solid #c8d4bc", backgroundColor: "#edf0e8", color: "#4a6b38", cursor: "pointer", fontWeight: "500" }}>
+          <Languages size={13} />
           {lang === "en" ? "हिंदी" : "English"}
         </button>
-      </header>
+      </div>
 
-      {/* MAIN */}
-      <main className="w-full max-w-2xl">
-        <p className="text-sm sm:text-base mb-6" style={{ color: "#7a8c6e" }}>{t.tagline}</p>
+      {/* MAIN CARD */}
+      <div style={{ width: "100%", maxWidth: "480px", backgroundColor: "#ffffff", borderRadius: "20px", boxShadow: "0 4px 24px rgba(0,0,0,0.08)", border: "1px solid #dde5d4", padding: "28px" }}>
 
-        {!result && (
-          <div className="space-y-3">
-            <div className="relative">
-              <textarea
-                value={jobText}
-                onChange={(e) => setJobText(e.target.value)}
-                placeholder={t.placeholder}
-                rows={9}
-                disabled={loading}
-                className="w-full resize-none rounded-2xl outline-none p-4 sm:p-5 text-sm sm:text-base transition-colors disabled:opacity-50"
-                style={{
-                  backgroundColor: "#FFFFFF",
-                  border: "1.5px solid #d6ddd0",
-                  color: "#2c3a20",
-                  caretColor: "#6B8C5A",
-                }}
-                onFocus={e => e.target.style.borderColor = "#6B8C5A"}
-                onBlur={e => e.target.style.borderColor = "#d6ddd0"}
-              />
-              <button
-                onClick={handlePaste}
-                disabled={loading}
-                className="absolute top-3 right-3 flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg transition-colors"
-                style={{ backgroundColor: "#edf0e8", color: "#6B8C5A" }}
-              >
-                <ClipboardPaste className="w-3.5 h-3.5" />
-                {t.pasteBtn}
-              </button>
+        {!result ? (
+          <>
+            <div style={{ marginBottom: "16px" }}>
+              <h2 style={{ fontSize: "18px", fontWeight: "700", color: "#2c3a20", margin: "0 0 4px 0", fontFamily: "'Space Grotesk', sans-serif" }}>{t.tagline}</h2>
             </div>
+
+            <textarea
+              value={jobText}
+              onChange={(e) => setJobText(e.target.value)}
+              placeholder={t.placeholder}
+              rows={7}
+              disabled={loading}
+              style={{ width: "100%", resize: "none", borderRadius: "12px", border: "1.5px solid #d6ddd0", padding: "14px", fontSize: "14px", color: "#2c3a20", backgroundColor: "#fafaf8", outline: "none", boxSizing: "border-box", fontFamily: "'Inter', sans-serif", marginBottom: "4px" }}
+              onFocus={e => e.target.style.borderColor = "#6B8C5A"}
+              onBlur={e => e.target.style.borderColor = "#d6ddd0"}
+            />
 
             {error && (
-              <p className="text-red-500 text-sm flex items-center gap-1.5">
-                <AlertCircle className="w-4 h-4" /> {error}
-              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#dc2626", fontSize: "13px", marginBottom: "10px" }}>
+                <AlertCircle size={14} /> {error}
+              </div>
             )}
 
-            <button
-              onClick={handleAnalyze}
-              disabled={loading}
-              className="w-full rounded-2xl text-white font-semibold py-3.5 sm:py-4 text-sm sm:text-base transition-all flex items-center justify-center gap-2"
-              style={{ backgroundColor: loading ? "#9ab08a" : "#6B8C5A" }}
-            >
-              {loading ? (
-                <><Loader2 className="w-4 h-4 animate-spin" />{t.analyzing}</>
-              ) : (
-                <><ShieldCheck className="w-4 h-4" />{t.analyzeBtn}</>
-              )}
+            <button onClick={handleAnalyze} disabled={loading}
+              style={{ width: "100%", padding: "14px", borderRadius: "12px", backgroundColor: loading ? "#9ab08a" : "#6B8C5A", color: "#fff", fontWeight: "600", fontSize: "15px", border: "none", cursor: loading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginTop: "12px" }}>
+              {loading ? <><Loader2 size={16} className="animate-spin" style={{ animation: "spin 1s linear infinite" }} />{t.analyzing}</> : <><ShieldCheck size={16} />{t.analyzeBtn}</>}
             </button>
-          </div>
-        )}
-
-        {/* RESULT */}
-        {result && (
-          <div className="space-y-4 animate-[slideInFromRight_0.35s_ease-out]">
-            <div
-              className={`rounded-2xl border-2 ${VERDICT_STYLES[result.verdict].border} ${VERDICT_STYLES[result.verdict].bg} p-5 sm:p-6 ${result.verdict === "red" ? "animate-[shake_0.5s_ease-in-out]" : ""}`}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs uppercase tracking-wider" style={{ color: "#7a8c6e" }}>{t.resultTitle}</span>
-                {(() => {
-                  const Icon = VERDICT_STYLES[result.verdict].icon;
-                  return (
-                    <span className={`flex items-center gap-1.5 text-sm font-semibold ${VERDICT_STYLES[result.verdict].text}`}>
-                      <Icon className="w-4 h-4" />{t.verdicts[result.verdict]}
-                    </span>
-                  );
-                })()}
+          </>
+        ) : (
+          <>
+            {/* RESULT */}
+            <div style={{ border: `2px solid ${STYLES[result.verdict].border}`, backgroundColor: STYLES[result.verdict].bg, borderRadius: "14px", padding: "20px", marginBottom: "16px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                <span style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", color: "#7a8c6e", fontWeight: "600" }}>{t.resultTitle}</span>
+                {(() => { const Icon = STYLES[result.verdict].icon; return (
+                  <span style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "13px", fontWeight: "700", color: STYLES[result.verdict].text }}>
+                    <Icon size={15} />{t.verdicts[result.verdict]}
+                  </span>
+                ); })()}
               </div>
-              <div className="mb-1.5 flex items-baseline justify-between">
-                <span className="text-sm" style={{ color: "#7a8c6e" }}>{t.riskScore}</span>
-                <span className={`text-2xl font-bold ${VERDICT_STYLES[result.verdict].text}`} style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  {result.risk_score}<span className="text-sm font-normal text-gray-400">/100</span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "8px" }}>
+                <span style={{ fontSize: "13px", color: "#7a8c6e" }}>{t.riskScore}</span>
+                <span style={{ fontSize: "26px", fontWeight: "800", color: STYLES[result.verdict].text, fontFamily: "'Space Grotesk', sans-serif" }}>
+                  {result.risk_score}<span style={{ fontSize: "13px", color: "#aaa", fontWeight: "400" }}>/100</span>
                 </span>
               </div>
-              <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: "#e0e7d8" }}>
-                <div
-                  className={`h-full rounded-full ${VERDICT_STYLES[result.verdict].bar} transition-all duration-700 ease-out`}
-                  style={{ width: `${result.risk_score}%` }}
-                />
+              <div style={{ height: "8px", borderRadius: "99px", backgroundColor: "#e0e7d8", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${result.risk_score}%`, backgroundColor: STYLES[result.verdict].bar, borderRadius: "99px", transition: "width 0.7s ease-out" }} />
               </div>
             </div>
 
-            <div className="rounded-2xl border p-5 sm:p-6" style={{ borderColor: "#d6ddd0", backgroundColor: "#FFFFFF" }}>
-              <span className="text-xs uppercase tracking-wider mb-3 block" style={{ color: "#7a8c6e" }}>{t.redFlagsTitle}</span>
+            {/* RED FLAGS */}
+            <div style={{ border: "1px solid #dde5d4", borderRadius: "14px", padding: "18px", marginBottom: "16px", backgroundColor: "#fafaf8" }}>
+              <div style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", color: "#7a8c6e", fontWeight: "600", marginBottom: "12px" }}>{t.redFlagsTitle}</div>
               {result.red_flags.length === 0 ? (
-                <p className="text-sm flex items-center gap-1.5" style={{ color: "#7a8c6e" }}>
-                  <CheckCircle2 className="w-4 h-4 text-[#6B8C5A]" /> {t.noFlags}
-                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: "7px", color: "#6B8C5A", fontSize: "14px" }}>
+                  <CheckCircle2 size={15} /> {t.noFlags}
+                </div>
               ) : (
-                <ul className="space-y-2.5">
+                <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: "10px" }}>
                   {result.red_flags.map((flag, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-sm sm:text-base" style={{ color: "#3d4f30" }}>
-                      <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-red-500" />
-                      {flag}
+                    <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: "8px", fontSize: "14px", color: "#3d4f30" }}>
+                      <AlertTriangle size={15} color="#dc2626" style={{ marginTop: "2px", flexShrink: 0 }} />{flag}
                     </li>
                   ))}
                 </ul>
               )}
             </div>
 
-            <button
-              onClick={reset}
-              className="w-full rounded-2xl font-medium py-3.5 sm:py-4 text-sm sm:text-base transition-colors"
-              style={{ border: "1.5px solid #c8d4bc", backgroundColor: "#edf0e8", color: "#4a6b38" }}
-            >
+            <button onClick={reset}
+              style={{ width: "100%", padding: "12px", borderRadius: "12px", border: "1.5px solid #c8d4bc", backgroundColor: "#edf0e8", color: "#4a6b38", fontWeight: "600", fontSize: "14px", cursor: "pointer" }}>
               {t.newScan}
             </button>
-          </div>
+          </>
         )}
-      </main>
+      </div>
+
+      {/* FOOTER */}
+      <div style={{ marginTop: "16px", fontSize: "11px", color: "#9aaa8e" }}>Protected by JobShield AI • Powered by Claude</div>
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
